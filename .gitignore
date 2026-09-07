@@ -1,0 +1,17 @@
+# Rust
+target/
+
+# C/C++
+build/
+*.o
+*.so
+*.a
+
+# Editors
+.vscode/
+.idea/
+
+# Logs/temp
+*.log
+*.tmp
+*.swp
