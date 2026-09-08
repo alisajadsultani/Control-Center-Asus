@@ -1,0 +1,39 @@
+[Unit]
+Description=Control Center system-control daemon
+Documentation=https://github.com/alisultani/Control-Center-Asus
+# The daemon is useless without D-Bus, and we want it to come up alongside
+# the rest of the system rather than racing user sessions.
+After=dbus.service
+Requires=dbus.service
+
+[Service]
+# D-Bus activation: systemd starts this the first time something calls
+# org.controlcenter.Daemon1 on the system bus, and dbus-daemon tells systemd
+# it's ready once BusName is acquired (paired with dbus/org.controlcenter.Daemon1.service).
+Type=dbus
+BusName=org.controlcenter.Daemon1
+ExecStart=/usr/local/bin/controlcenterd
+Restart=on-failure
+RestartSec=2
+
+# --- Sandboxing -------------------------------------------------------
+# This runs as root because it writes to /sys -- but "runs as root" and
+# "runs unconfined" don't have to be the same thing. These narrow the
+# process down to exactly the filesystem access it needs.
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+NoNewPrivileges=true
+ProtectKernelModules=true
+ProtectKernelLogs=true
+ProtectControlGroups=true
+RestrictNamespaces=true
+LockPersonality=true
+MemoryDenyWriteExecute=true
+
+# The one write target the daemon actually needs, carved out of the
+# otherwise-read-only filesystem above.
+ReadWritePaths=/sys/class/power_supply
+
+[Install]
+WantedBy=multi-user.target

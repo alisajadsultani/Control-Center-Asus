@@ -1,0 +1,22 @@
+The new description:
+
+Developing a Linux-native hardware monitoring, control, and diagnostics platform for the ASUS ROG Zephyrus G16 using Rust and C++.
+
+Implementing a privileged Rust daemon that communicates with Linux hardware interfaces, exposes a D-Bus API, integrates with systemd, manages system state and configuration, and provides permission checks, rate limiting, error handling, and safe restoration of hardware settings.
+Mainly Rust
+
+Developing a C++ hardware layer that integrates with NVIDIA NVML and Linux system interfaces to retrieve CPU, GPU, battery, storage, memory, thermal, fan, and power information and support hardware diagnostics and controlled system operations.
+Mainly C++
+
+Building a System Control interface for managing laptop settings such as battery charging limits, platform/performance profiles, power-related settings, and other supported system controls.
+Rust for control logic and D-Bus handling; C++ for hardware-level operations where needed
+
+Building a System Monitoring interface that displays real-time CPU and GPU temperatures and utilization, memory usage, storage capacity and usage, battery information, fan speeds, and detailed laptop hardware information including the processor, graphics devices, memory, storage, firmware, and other detected components.
+C++ for telemetry collection; Rust for aggregation, state, and exposing data to the interface
+
+Building a Fan Control system with selectable performance profiles such as Quiet, Balanced, and Performance; separate CPU and GPU fan curves; and editable temperature-to-fan-speed curves. Supporting custom fan-profile creation, saving, switching, enabling, applying, resetting, and restoring factory-default settings.
+C++ for fan/hardware interaction; Rust for profile management, validation, persistence, and safe recovery
+
+Building a System Diagnostics interface that runs individual or combined hardware checks, shows which components and system areas are being tested, and reports the result of each diagnostic. Diagnostics evaluate areas such as CPU and GPU thermals, throttling, battery health, fan response, storage, memory, sensor consistency, and system configuration.
+C++ for low-level hardware tests; Rust for orchestration, result handling, and diagnostic workflow
+clauide

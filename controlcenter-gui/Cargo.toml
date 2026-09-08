@@ -1,0 +1,21 @@
+[package]
+name = "controlcenter-gui"
+description = "Desktop GUI for Control Center"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+
+[[bin]]
+name = "controlcenter-gui"
+path = "src/main.rs"
+
+[dependencies]
+# Pinned below 0.36 because that release bumped its MSRV past the rustc
+# available here (1.92). 0.32 is the newest release still compatible.
+eframe = "=0.32.3"
+# Default features (not the workspace's tokio-flavored `zbus`): this pulls
+# in zbus's own tiny executor and its blocking API, so the GUI can make a
+# D-Bus call directly from the (synchronous) egui update loop without
+# needing an async runtime of its own.
+zbus = "5"

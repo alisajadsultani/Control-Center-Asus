@@ -1,0 +1,20 @@
+[package]
+name = "controlcenterd"
+description = "D-Bus daemon exposing laptop hardware controls (starting with battery charge limit)"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+
+[[bin]]
+name = "controlcenterd"
+path = "src/main.rs"
+
+[dependencies]
+zbus.workspace = true
+zbus_polkit.workspace = true
+tokio.workspace = true
+thiserror.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+anyhow.workspace = true

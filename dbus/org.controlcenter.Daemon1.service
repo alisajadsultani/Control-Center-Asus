@@ -1,0 +1,5 @@
+[D-BUS Service]
+Name=org.controlcenter.Daemon1
+Exec=/usr/local/bin/controlcenterd
+User=root
+SystemdService=controlcenterd.service

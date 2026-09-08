@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE policyconfig PUBLIC "-//freedesktop//DTD PolicyKit Policy Configuration 1.0//EN"
+ "http://www.freedesktop.org/standards/PolicyKit/1/policyconfig.dtd">
+<policyconfig>
+  <vendor>Control Center</vendor>
+  <vendor_url>https://github.com/alisultani/Control-Center-Asus</vendor_url>
+
+  <action id="org.controlcenter.daemon.set-charge-limit">
+    <description>Set the battery charge limit</description>
+    <message>Authentication is required to change the battery charge limit</message>
+    <icon_name>battery</icon_name>
+    <defaults>
+      <!--
+        This isn't a security-sensitive action (worst case is a battery
+        wears out a bit faster), so we grant it to any user with an active
+        local session with no password prompt, the same tier NetworkManager
+        uses for "enable Wi-Fi" or logind uses for "suspend". A remote or
+        inactive session (allow_any / allow_inactive) still gets nothing.
+      -->
+      <allow_any>no</allow_any>
+      <allow_inactive>no</allow_inactive>
+      <allow_active>yes</allow_active>
+    </defaults>
+  </action>
+</policyconfig>
