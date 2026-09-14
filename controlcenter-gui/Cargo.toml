@@ -14,6 +14,7 @@ path = "src/main.rs"
 # Pinned below 0.36 because that release bumped its MSRV past the rustc
 # available here (1.92). 0.32 is the newest release still compatible.
 eframe = "=0.32.3"
+log = "0.4.34"
 # Default features (not the workspace's tokio-flavored `zbus`): this pulls
 # in zbus's own tiny executor and its blocking API, so the GUI can make a
 # D-Bus call directly from the (synchronous) egui update loop without

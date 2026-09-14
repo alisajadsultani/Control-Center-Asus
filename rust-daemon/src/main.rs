@@ -1,9 +1,9 @@
-mod battery;
-mod dbus_iface;
 mod error;
 mod polkit;
+mod system_control;
 
-use dbus_iface::BatteryInterface;
+use system_control::{discover_threshold_path, BatteryInterface, discover_platform_path, PlatformProfileInterface};
+use zbus::zvariant::Signature::ObjectPath;
 
 /// D-Bus well-known name this daemon owns on the system bus.
 const BUS_NAME: &str = "org.controlcenter.Daemon1";
@@ -17,16 +17,14 @@ async fn main() -> anyhow::Result<()> {
         .init();
 
     if !running_as_root() {
-        // Not a hard failure: it lets you run the binary directly during
-        // development to see it register on the bus and respond to
-        // GetChargeLimit. Any actual SetChargeLimit write will fail with a
-        // permission error until this runs as root.
+        // Not fatal: lets the binary run during development to see it
+        // register on the bus; SetChargeLimit will fail until run as root.
         tracing::warn!(
             "not running as root -- hardware writes to sysfs will fail with permission errors"
         );
     }
 
-    let threshold_path = battery::discover_threshold_path();
+    let threshold_path = discover_threshold_path();
     match &threshold_path {
         Some(path) => {
             tracing::info!(path = %path.display(), "found battery charge-limit control")
@@ -37,11 +35,24 @@ async fn main() -> anyhow::Result<()> {
         ),
     }
 
+    let platform_path  = discover_platform_path();
+    match &platform_path {
+        Some(path) => {
+            tracing::info!(path = %&path.display(), "found platform profile control")
+        }
+        None => tracing::warn!{
+            "no platform profile on this system exposes a control; \
+            the platoform profile will report Supported=false"
+        },
+    }
+
     let battery_iface = BatteryInterface::new(threshold_path);
+    let platform_prfile_iface = PlatformProfileInterface::new(platform_path);
 
     let connection = zbus::connection::Builder::system()?
         .name(BUS_NAME)?
         .serve_at(OBJECT_PATH, battery_iface)?
+        .serve_at(OBJECT_PATH, platform_prfile_iface)?
         .build()
         .await?;
 
@@ -59,10 +70,8 @@ async fn main() -> anyhow::Result<()> {
 }
 
 fn running_as_root() -> bool {
-    // No extra crate for this -- /proc/self/status is always available on
-    // Linux and its "Uid:" line lists real/effective/saved/filesystem uid.
-    // We care about the effective uid (2nd field), since that's what
-    // governs whether our sysfs writes are actually permitted.
+    // /proc/self/status's "Uid:" line lists real/effective/saved/fs uid;
+    // the effective uid (2nd field) is what governs sysfs write permission.
     let Ok(status) = std::fs::read_to_string("/proc/self/status") else {
         return false;
     };

@@ -1,11 +1,6 @@
-//! The daemon's authorization gate.
-//!
-//! `set_charge_limit` calls [`authorize`] before it touches hardware.
-//! D-Bus itself only answers "can this process talk to the daemon at all"
-//! (see `dbus/org.controlcenter.Daemon1.conf`); polkit is what answers the
-//! finer-grained "is *this specific caller* allowed to do *this specific
-//! action* right now" -- including prompting for authentication if the
-//! system is configured to require it.
+//! The daemon's authorization gate. D-Bus (`dbus/org.controlcenter.Daemon1.conf`)
+//! only answers "can this process reach the daemon at all"; polkit answers
+//! the finer-grained "is *this caller* allowed to do *this action* now."
 
 use zbus::connection::Connection;
 use zbus::message::Header;
@@ -14,11 +9,10 @@ use zbus_polkit::policykit1::{AuthorityProxy, CheckAuthorizationFlags, Subject};
 use crate::error::ControlError;
 
 /// Asks polkit whether the sender of `header` is authorized for
-/// `action_id`, as registered in `polkit/org.controlcenter.daemon.policy`.
+/// `action_id` (registered in `polkit/org.controlcenter.daemon.policy`).
 ///
-/// We identify the caller with `Subject::new_for_message_header`, which
-/// builds a `system-bus-name` subject from the D-Bus sender -- polkit then
-/// resolves that back to a PID/UID on its own, so we never have to trust a
+/// `Subject::new_for_message_header` builds the subject from the D-Bus
+/// sender -- polkit resolves that to a PID/UID itself, so we never trust a
 /// UID the client claims to be.
 pub async fn authorize(
     connection: &Connection,

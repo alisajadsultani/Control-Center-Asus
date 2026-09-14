@@ -640,6 +640,7 @@ name = "controlcenter-gui"
 version = "0.1.0"
 dependencies = [
  "eframe",
+ "log",
  "zbus",
 ]
 
@@ -648,6 +649,7 @@ name = "controlcenterd"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "log",
  "thiserror 2.0.20",
  "tokio",
  "tracing",

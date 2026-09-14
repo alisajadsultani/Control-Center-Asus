@@ -22,4 +22,23 @@
       <allow_active>yes</allow_active>
     </defaults>
   </action>
+
+  <action id="org.controlcenter.daemon.set-platform_profile">
+    <description>Change the Platform Profile</description>
+    <message>Authentication is required to change the platform profile</message>
+    <icon_name>platform profile</icon_name>
+    <defaults>
+      <!--
+        This isn't a security-sensitive action (worst case is a battery
+        wears out a bit faster), so we grant it to any user with an active
+        local session with no password prompt, the same tier NetworkManager
+        uses for "enable Wi-Fi" or logind uses for "suspend". A remote or
+        inactive session (allow_any / allow_inactive) still gets nothing.
+      -->
+      <allow_any>no</allow_any>
+      <allow_inactive>no</allow_inactive>
+      <allow_active>yes</allow_active>
+    </defaults>
+  </action>
+
 </policyconfig>
