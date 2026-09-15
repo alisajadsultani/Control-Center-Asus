@@ -37,7 +37,7 @@ impl PlatformProfileInterface {
     }
 
     #[zbus(property)]
-    async fn profile(&self) -> zbus::fdo::Result<String> {
+    async fn read_profile(&self) -> zbus::fdo::Result<String> {
         let path = self
             .profile_path
             .as_ref()
@@ -63,7 +63,7 @@ impl PlatformProfileInterface {
 
         // `profile` being `#[zbus(property)]` generates this method for
         // free -- it emits the standard PropertiesChanged signal.
-        if let Err(err) = self.profile_changed(&emitter).await {
+        if let Err(err) = self.read_profile_changed(&emitter).await {
             tracing::warn!(%err, "failed to emit Profile PropertiesChanged notification");
         }
 

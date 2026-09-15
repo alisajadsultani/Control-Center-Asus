@@ -242,6 +242,35 @@ sudo systemctl daemon-reload
 sudo systemctl restart controlcenterd
 ```
 
+## TODO: first live deploy of platform profile (checklist)
+
+Platform profile's daemon side has never been installed/restarted on the
+real system -- everything below has only been checked with `cargo build`,
+not against the real D-Bus bus. Delete this section once you've run
+through it (or delete individual lines as you do them).
+
+- [ ] `cargo build --release -p controlcenterd`
+- [ ] `sudo install -Dm755 target/release/controlcenterd /usr/local/bin/controlcenterd`
+- [ ] `sudo install -Dm644 dbus/org.controlcenter.Daemon1.conf /etc/dbus-1/system.d/org.controlcenter.Daemon1.conf`
+- [ ] `sudo install -Dm644 dbus/org.controlcenter.Daemon1.service /usr/share/dbus-1/system-services/org.controlcenter.Daemon1.service`
+- [ ] `sudo install -Dm644 polkit/org.controlcenter.daemon.policy /usr/share/polkit-1/actions/org.controlcenter.daemon.policy`
+- [ ] `sudo install -Dm644 systemd/controlcenterd.service /etc/systemd/system/controlcenterd.service`
+- [ ] `sudo systemctl daemon-reload`
+- [ ] `sudo systemctl restart controlcenterd`
+- [ ] `systemctl status controlcenterd --no-pager` -- confirm it's active, no crash-loop
+- [ ] `busctl introspect org.controlcenter.Daemon1 /org/controlcenter/Daemon1` -- confirm
+      both `...Battery` and `...PlatformProfile` are listed
+- [ ] `cargo run -p controlcenter-gui` -- click Apply on both the Battery
+      and Platform Profile panels against the real daemon (neither has
+      been tested live end-to-end through the GUI yet)
+- [ ] While in there: confirm the long-standing `ChargeLimit` "Access
+      denied" bug (see Testing status) is actually gone now that the
+      `.conf` is reinstalled -- `busctl get-property ... ChargeLimit`
+
+This is a superset of the general "Redeploying after a change" table
+below -- that table is the reference for *future* one-off changes; this
+checklist is only for catching this repo up the first time.
+
 ## Immediate next steps
 
 1. **Fix `controlcenter-gui/src/system_control/platform_profile.rs`** --

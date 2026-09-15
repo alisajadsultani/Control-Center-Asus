@@ -33,9 +33,7 @@ fn apply_charge_limit(limit: u8) -> zbus::Result<u8> {
 
 fn fetch_charge_limit() -> zbus::Result<u8> {
     let connection = zbus::blocking::Connection::system()?;
-    let battery = BatteryProxyBlocking::new(&connection)?;
-    let battery_value = battery.charge_limit()?;
-    debug!("Testing: the current value is {}", battery_value);
+    let battery: BatteryProxyBlocking<'_> = BatteryProxyBlocking::new(&connection)?;
     battery.charge_limit()
 }
 
@@ -52,13 +50,7 @@ pub struct State {
 
 impl Default for State {
     fn default() -> Self {
-        // Best-effort: start at the real current value if the daemon is
-        // reachable, otherwise fall back quietly.
-        let limit = fetch_charge_limit().unwrap_or(100);
-        
-        // Pass a format string argument to the macro
-        debug!("Testing: the current value is {}", limit);
-        
+
         Self {
             charge_limit: fetch_charge_limit().unwrap_or(100),
             apply_status: ApplyStatus::Idle,
