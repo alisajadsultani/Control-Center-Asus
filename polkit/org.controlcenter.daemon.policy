@@ -41,4 +41,16 @@
     </defaults>
   </action>
 
+  <action id="org.controlcenter.daemon.apply-os-update">
+    <description>Apply operating system updates</description>
+    <message>Authentication is required to update system packages</message>
+    <icon_name>system-software-update</icon_name>
+    <defaults>
+      <!-- Real blast radius (apt upgrade), so always asks for the admin password. -->
+      <allow_any>no</allow_any>
+      <allow_inactive>no</allow_inactive>
+      <allow_active>auth_admin</allow_active>
+    </defaults>
+  </action>
+
 </policyconfig>

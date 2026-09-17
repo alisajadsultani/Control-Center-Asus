@@ -28,6 +28,16 @@ pub enum ControlError {
 
     #[error("could not reach polkit authority: {0}")]
     PolkitUnavailable(#[source] zbus::Error),
+
+    #[error("failed to run `{command}`: {source}")]
+    CommandSpawn {
+        command: String,
+        #[source]
+        source: std::io::Error,
+    },
+
+    #[error("update task for {category} failed ({status})")]
+    UpdateFailed { category: String, status: String },
 }
 
 impl From<ControlError> for zbus::fdo::Error {
@@ -41,7 +51,9 @@ impl From<ControlError> for zbus::fdo::Error {
             ControlError::SysfsRead(_)
             | ControlError::SysfsWrite(_)
             | ControlError::UnexpectedSysfsValue(_)
-            | ControlError::PolkitUnavailable(_) => zbus::fdo::Error::Failed(err.to_string()),
+            | ControlError::PolkitUnavailable(_)
+            | ControlError::CommandSpawn { .. }
+            | ControlError::UpdateFailed { .. } => zbus::fdo::Error::Failed(err.to_string()),
         }
     }
 }

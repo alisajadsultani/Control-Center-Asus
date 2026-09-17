@@ -2,8 +2,10 @@ mod error;
 mod polkit;
 mod system_control;
 
-use system_control::{discover_threshold_path, BatteryInterface, discover_platform_path, PlatformProfileInterface};
-use zbus::zvariant::Signature::ObjectPath;
+use system_control::{
+    discover_platform_path, discover_threshold_path, BatteryInterface, PlatformProfileInterface,
+    UpdatesInterface,
+};
 
 /// D-Bus well-known name this daemon owns on the system bus.
 const BUS_NAME: &str = "org.controlcenter.Daemon1";
@@ -38,21 +40,23 @@ async fn main() -> anyhow::Result<()> {
     let platform_path  = discover_platform_path();
     match &platform_path {
         Some(path) => {
-            tracing::info!(path = %&path.display(), "found platform profile control")
+            tracing::info!(path = %path.display(), "found platform profile control")
         }
         None => tracing::warn!{
             "no platform profile on this system exposes a control; \
-            the platoform profile will report Supported=false"
+            the platform profile will report Supported=false"
         },
     }
 
     let battery_iface = BatteryInterface::new(threshold_path);
-    let platform_prfile_iface = PlatformProfileInterface::new(platform_path);
+    let platform_profile_iface = PlatformProfileInterface::new(platform_path);
+    let updates_iface = UpdatesInterface::default();
 
     let connection = zbus::connection::Builder::system()?
         .name(BUS_NAME)?
         .serve_at(OBJECT_PATH, battery_iface)?
-        .serve_at(OBJECT_PATH, platform_prfile_iface)?
+        .serve_at(OBJECT_PATH, platform_profile_iface)?
+        .serve_at(OBJECT_PATH, updates_iface)?
         .build()
         .await?;
 

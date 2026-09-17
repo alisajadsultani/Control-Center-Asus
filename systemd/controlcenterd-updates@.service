@@ -1,0 +1,11 @@
+[Unit]
+Description=Control Center on-demand update task (%i)
+# Separate from controlcenterd.service: applying an update needs broad
+# filesystem write access, which that daemon's ProtectSystem=strict
+# sandbox blocks. This unit is unsandboxed but only runs on-demand.
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/libexec/controlcenterd/update-%i.sh
+# Script creates /run/controlcenterd and redirects its own output there --
+# see scripts/updates/update-os.sh.
